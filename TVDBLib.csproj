@@ -40,9 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TvdbImage.cs" />
     <Compile Include="TvdbLib.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TvdbMirror.cs" />
+    <Compile Include="TvdbSeries.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="LICENSE.txt" />

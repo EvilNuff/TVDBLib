@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Net;
@@ -22,6 +23,9 @@ namespace TVDBLib
         private readonly string _apiKey;
 
         private const string API_MIRRORS = "http://www.thetvdb.com/api/{0}/mirrors.xml";
+        private const string API_SERIE = "http://www.thetvdb.com/api/{0}/series/{1}";
+        private const string API_SERIE_SEARCH = "http://www.thetvdb.com/api/GetSeries.php?seriesname={0}";
+        private const string API_IMAGE_LIST = "http://www.thetvdb.com/api/{0}/series/{1}/banners.xml";
 
         public TvdbLib(string api)
         {
@@ -37,10 +41,34 @@ namespace TVDBLib
             _zipMirror = mirrors.Where(x => (x.Typemask & ZIP_MASK) != 0).OrderBy(x => rnd.Next()).First().MirrorPath;
         }
 
+        public TvdbSeries Series(int id)
+        {
+            return Parse<TvdbSeries>(string.Format(API_SERIE, _apiKey, id));
+        }
+
+        public TvdbSeries[] SeriesSearch(string name)
+        {
+            return Parse<TvdbSeriesSearchResult>(string.Format(API_SERIE_SEARCH, name)).Series;
+        }
+
+        public TvdbImage[] ImageList(int seriesId)
+        {
+            return Parse<TvdvbImageSearchResults>(string.Format(API_IMAGE_LIST, _apiKey, seriesId)).Images;
+        }
+
         private static T Parse<T>(string uri)
         {
             var wc = new WebClient();
-            var s = new XmlSerializer(typeof(T));
+            XmlSerializer s;
+            try
+            {
+                s = new XmlSerializer(typeof (T));
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.InnerException);
+                throw;
+            }
             var data = wc.DownloadData(uri);
             var xml = System.Text.Encoding.UTF8.GetString(data).Trim();
 
