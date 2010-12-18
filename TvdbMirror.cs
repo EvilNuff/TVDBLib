@@ -7,19 +7,18 @@ using System.Xml.Serialization;
 namespace TVDBLib
 {
     [XmlRoot("Mirrors")]
-    class TvdbMirrorSearchResult
+    public class TvdbMirrorSearchResult
     {
-        [XmlArrayAttribute("Mirror")]
+        [XmlElement("Mirror")]
         public TvdbMirror[] Mirrors;
     }
 
-    [XmlType("Mirror")]
-    class TvdbMirror
+    public class TvdbMirror
     {
-        [XmlAttribute("mirrorpath")]
+        [XmlElement("mirrorpath")]
         public string MirrorPath;
 
-        [XmlAttribute("typepath")]
+        [XmlElement("typemask")]
         public int Typemask;
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Net;
 using System.Xml.Serialization;
 using System.IO;
+using System.Xml;
 
 namespace TVDBLib
 {
@@ -31,9 +32,9 @@ namespace TVDBLib
 
             // Save a random mirror, per the API specifications
             var rnd = new Random();
-            _xmlMirror = mirrors.Where(x => (x.Typemask & XML_MASK) == 1).OrderBy(x => rnd.Next()).First().MirrorPath;
-            _bannerMirror = mirrors.Where(x => (x.Typemask & BANNER_MASK) == 1).OrderBy(x => rnd.Next()).First().MirrorPath;
-            _zipMirror = mirrors.Where(x => (x.Typemask & ZIP_MASK) == 1).OrderBy(x => rnd.Next()).First().MirrorPath;
+            _xmlMirror = mirrors.Where(x => (x.Typemask & XML_MASK) != 0).OrderBy(x => rnd.Next()).First().MirrorPath;
+            _bannerMirror = mirrors.Where(x => (x.Typemask & BANNER_MASK) != 0).OrderBy(x => rnd.Next()).First().MirrorPath;
+            _zipMirror = mirrors.Where(x => (x.Typemask & ZIP_MASK) != 0).OrderBy(x => rnd.Next()).First().MirrorPath;
         }
 
         private static T Parse<T>(string uri)
@@ -41,7 +42,7 @@ namespace TVDBLib
             var wc = new WebClient();
             var s = new XmlSerializer(typeof(T));
             var data = wc.DownloadData(uri);
-            var xml = System.Text.Encoding.UTF8.GetString(data);
+            var xml = System.Text.Encoding.UTF8.GetString(data).Trim();
 
             if (!xml.StartsWith("<?xml"))
             {
@@ -53,7 +54,17 @@ namespace TVDBLib
             }
 
             TextReader r = new StringReader(xml);
-            return (T)s.Deserialize(r);
+
+            T t;
+            try
+            {
+                t = (T) s.Deserialize(r);
+            } catch(Exception e)
+            {
+                Console.WriteLine(e.InnerException);
+                throw;
+            }
+            return t;
         }
     }
 }
