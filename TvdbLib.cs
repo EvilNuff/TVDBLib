@@ -29,7 +29,7 @@ namespace TVDBLib
             var search = Parse<TvdbMirrorSearchResult>(string.Format(API_MIRRORS, _apiKey));
             var mirrors = search.Mirrors;
 
-            // Save a random mirrors, per the API specifications
+            // Save a random mirror, per the API specifications
             var rnd = new Random();
             _xmlMirror = mirrors.Where(x => (x.Typemask & XML_MASK) == 1).OrderBy(x => rnd.Next()).First().MirrorPath;
             _bannerMirror = mirrors.Where(x => (x.Typemask & BANNER_MASK) == 1).OrderBy(x => rnd.Next()).First().MirrorPath;
